@@ -1,54 +1,67 @@
-
+# schemas/schemas.py
 
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel
-
-
-class Settings(BaseModel):
-    XRAY_API : str = None
-    API_TOKEN : str = None
-    CONFIG_PATH : str = None
+from pydantic import BaseModel, EmailStr
 
 # ==================================================
-# MODELS
+# SETTINGS
+# ==================================================
+
+class Settings(BaseModel):
+    XRAY_API: str | None = None
+    API_TOKEN: str | None = None
+    CONFIG_PATH: str | None = None
+
+# ==================================================
+# REQUESTS
 # ==================================================
 
 class EmailRequest(BaseModel):
-    email: str
+    email: EmailStr
 
 
 class UserActionRequest(BaseModel):
-    email: str
+    email: EmailStr
     uuid: str
 
 
-class DefineStatuts(str, Enum):
+class ActionType(str, Enum):
     STOP = "STOP"
     RESTART = "RESTART"
-    
+    OK = "ok"
+
 
 class UserActionService(BaseModel):
-    email: str
-    uuid: str
-    action : DefineStatuts = None
+    email: EmailStr
+    uuid: str | None = None
+    action: ActionType
+
+# ==================================================
+# RESPONSES
+# ==================================================
 
 class StandardResponse(BaseModel):
-    status : str = "ok"
-
-class CustomersResponse(BaseModel):
-    status: StandardResponse
-    customer : dict[str, Any]
+    status: str = ActionType.OK.value
 
 
-class UsageResponse(BaseModel):
-    status: StandardResponse
-    uplink: int  = 0,
-    downlink: int = 0,
-    total: int =0
+class ResponseAddUser(StandardResponse):
+    uuid: str
 
-class ResponseAddUser(BaseModel):
-    status: StandardResponse
-    uui : str = None
 
+class UsageResponse(StandardResponse):
+    uplink: int = 0
+    downlink: int = 0
+    total: int = 0
+
+
+class CustomerModel(BaseModel):
+    uuid: str
+    email: EmailStr
+    level: int = 0
+
+
+class CustomersResponse(StandardResponse):
+    count: int = 0
+    clients: list[CustomerModel] = []

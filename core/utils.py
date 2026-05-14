@@ -1,33 +1,55 @@
-
+# api/core/utils.py
 
 from fastapi import Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBearer
+)
+
 from core.settings import settings
 
-
+# ==================================================
+# SECURITY
+# ==================================================
 
 security = HTTPBearer()
 
-def env_isAvailable():
-    """
-    Verify into env file if settings is defined
-    """
-        
-    if not settings.XRAY_API:
-        raise RuntimeError("XRAY_API missing in .env")
-    if not settings.API_TOKEN:
-        raise RuntimeError("API_TOKEN missing in .env")
-    if not settings.CONFIG_PATH:
-        raise RuntimeError("CONFIG_PATH missing in .env")
+# ==================================================
+# ENV VALIDATION
+# ==================================================
 
+def env_is_available():
+    """
+    Verify required environment variables
+    """
+
+    required_settings = {
+        "XRAY_API": settings.XRAY_API,
+        "API_TOKEN": settings.API_TOKEN,
+        "CONFIG_PATH": settings.CONFIG_PATH
+    }
+
+    missing = [
+        key for key, value in required_settings.items()
+        if not value
+    ]
+
+    if missing:
+        raise RuntimeError(
+            f"Missing environment variables: {', '.join(missing)}"
+        )
+
+# ==================================================
+# AUTH
+# ==================================================
 
 def verify_token(
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """
-    Verify if token is available
-    
+    Verify bearer token
     """
+
     token = credentials.credentials
 
     if token != settings.API_TOKEN:
@@ -36,4 +58,4 @@ def verify_token(
             detail="Invalid token"
         )
 
-    return True
+    return token
