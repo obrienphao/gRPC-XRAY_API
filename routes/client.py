@@ -243,14 +243,9 @@ def get_clients(
 ):
     try:
 
-        customers = list_clients(
+        return list_clients(
             settings.CONFIG_PATH
         )
-
-        return {
-            "status": ActionType.OK.value,
-            "response": customers
-        }
 
     except Exception:
 
@@ -260,7 +255,6 @@ def get_clients(
             status_code=500,
             detail="Internal server error"
         )
-
 # ==================================================
 # SERVICE ACTION
 # ==================================================
