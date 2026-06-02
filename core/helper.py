@@ -92,10 +92,7 @@ def add_client_to_xray(config_path: str, email: str):
 
     save_config(data, config_path)
 
-    subprocess.run(
-        ["sudo", "systemctl", "restart", "xray"],
-        check=True
-    )
+    subprocess.Popen(["sudo", "systemctl", "restart", "xray"])
 
     return new_uuid
 
@@ -125,10 +122,7 @@ def list_clients(config_path: str):
 
 
 def restart_xray():
-    subprocess.run(
-        ["sudo", "systemctl", "restart", "xray"],
-        check=True
-    )
+    subprocess.Popen(["sudo", "systemctl", "restart", "xray"])
 
 
 def delete_client_from_xray(config_path: str, email: str):
